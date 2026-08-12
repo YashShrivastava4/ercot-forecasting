@@ -1,0 +1,18 @@
+# these are the exact versions this project was verified against, pin the
+# major version at least when installing, some of these libraries (especially
+# meteostat and gridstatus) change their API surface between versions
+gridstatus==0.36.0
+meteostat==2.1.4
+pandas==2.3.3
+pyarrow==24.0.0
+xgboost==3.4.0
+shap==0.52.0
+statsmodels==0.14.6
+holidays==0.102
+groq==1.6.0
+python-dotenv==1.2.2
+matplotlib==3.10.8
+plotly==6.9.0
+streamlit==1.61.1
+jupyter==1.1.1
+scikit-learn==1.8.0
