@@ -8,6 +8,9 @@ __pycache__/
 data/raw/*
 !data/raw/.gitkeep
 
+# Trained models
+models/*.pkl
+
 # data/processed/, models/, and outputs/ are intentionally NOT ignored below.
 # The deployed Streamlit app reads directly from these -- they need to be
 # committed, not regenerated at deploy time. See README's "Deploying" section.
