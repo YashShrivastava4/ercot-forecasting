@@ -16,3 +16,9 @@ plotly==6.9.0
 streamlit==1.61.1
 jupyter==1.1.1
 scikit-learn==1.8.0
+requests==2.33.1
+# pandas needs one of these to read Excel files -- xlrd for the older .xls
+# archive files (pre-2016), openpyxl for the newer .xlsx-based ones. Both are
+# small, installing both avoids guessing which format a given year's file uses.
+xlrd==2.0.2
+openpyxl==3.1.5

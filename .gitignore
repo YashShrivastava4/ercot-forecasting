@@ -2,11 +2,12 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+
+# raw ERCOT archive zips/xls -- large-ish and fully regenerable by re-running
+# `python3 -m src.download_archive`, no need to version-control these
 data/raw/*
-data/processed/*
-models/*
-outputs/*
 !data/raw/.gitkeep
-!data/processed/.gitkeep
-!models/.gitkeep
-!outputs/.gitkeep
+
+# data/processed/, models/, and outputs/ are intentionally NOT ignored below.
+# The deployed Streamlit app reads directly from these -- they need to be
+# committed, not regenerated at deploy time. See README's "Deploying" section.
