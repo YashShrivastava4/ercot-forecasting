@@ -15,7 +15,9 @@ def _drop_unpaired_nans(y_true: np.ndarray, y_pred: np.ndarray) -> tuple:
     mask = ~(np.isnan(y_true) | np.isnan(y_pred))
     dropped = len(y_true) - mask.sum()
     if dropped > 0:
-        print(f"  ({dropped} rows skipped in this metric due to NaN actual/predicted values)")
+        print(
+            f"  ({dropped} rows skipped in this metric due to NaN actual/predicted values)"
+        )
     return y_true[mask], y_pred[mask]
 
 
@@ -48,8 +50,8 @@ def compute_extreme_thresholds(train_daily_temp: pd.DataFrame) -> dict:
     """
     pct = config.EXTREME_TEMP_PERCENTILE
     return {
-        "low_cutoff": float(np.percentile(train_daily_temp["temp_min"], pct)),
-        "high_cutoff": float(np.percentile(train_daily_temp["temp_max"], 100 - pct)),
+        "low_cutoff": float(np.nanpercentile(train_daily_temp["temp_min"], pct)),
+        "high_cutoff": float(np.nanpercentile(train_daily_temp["temp_max"], 100 - pct)),
     }
 
 
@@ -61,13 +63,17 @@ def flag_extreme_days(daily_temp: pd.DataFrame, thresholds: dict) -> pd.Series:
     return is_extreme.rename("is_extreme_day")
 
 
-def segment_metrics_by_extreme_day(predictions_df: pd.DataFrame, extreme_dates: set) -> dict:
+def segment_metrics_by_extreme_day(
+    predictions_df: pd.DataFrame, extreme_dates: set
+) -> dict:
     """Split hourly actual/predicted rows into normal vs extreme days and score each group.
 
     predictions_df needs actual_mw and predicted_mw columns, hourly indexed.
     extreme_dates is a set of date objects, from flag_extreme_days().
     """
-    is_extreme = pd.Series(predictions_df.index.date, index=predictions_df.index).isin(extreme_dates)
+    is_extreme = pd.Series(predictions_df.index.date, index=predictions_df.index).isin(
+        extreme_dates
+    )
     normal = predictions_df[~is_extreme.values]
     extreme = predictions_df[is_extreme.values]
 
@@ -101,6 +107,10 @@ def time_ordered_split(df: pd.DataFrame, test_years: int = config.TEST_SET_YEARS
 
     train = df[df.index < test_start]
     test = df[(df.index >= test_start) & (df.index.year <= last_year)]
-    print(f"train: {train.index.min().date()} to {train.index.max().date()} ({len(train)} rows)")
-    print(f"test:  {test.index.min().date()} to {test.index.max().date()} ({len(test)} rows)")
+    print(
+        f"train: {train.index.min().date()} to {train.index.max().date()} ({len(train)} rows)"
+    )
+    print(
+        f"test:  {test.index.min().date()} to {test.index.max().date()} ({len(test)} rows)"
+    )
     return train, test
