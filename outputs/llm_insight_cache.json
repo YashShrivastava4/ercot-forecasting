@@ -1,0 +1,77 @@
+{
+  "2025-12-31_2025-12-31": {
+    "fingerprint": "d6037492d30c3704",
+    "text": "**Model Insight**  \n- The error was far better than usual, about a quarter lower than the typical yearly error.  \n- The model ran low, missing the real demand by roughly 13\u202fMW each hour.  \n- The biggest driver was the demand from the previous hour, which pulled the forecast down.  \n- The unusually cold temperature also lowered the forecast, but recent demand history mattered more.  \n\n**Business Insight**  \n- The forecast was off by less than one percent, so the risk to planning was tiny.  \n- Under\u2011predicting by about 13\u202fMW per hour means a very small chance of needing a little extra reserve.  \n- Because the error was so small, operators could stick with their normal reserve levels without major adjustments.  \n- Overall the model\u2019s reliability gave the grid operator confidence that supply would meet demand on that day.",
+    "generated_at": "2026-08-21T19:59:08.046015+00:00"
+  },
+  "2025-12-30_2025-12-30": {
+    "fingerprint": "e785575e9766c97f",
+    "text": "**Model Insight**  \n- The forecast error was about 40\u202f% better than the model\u2019s usual error for the year.  \n- It ran low, missing the actual demand by roughly 60\u202fMW each hour.  \n- The biggest influence was the colder\u2011than\u2011usual temperature, which cut demand by about 130\u202fMW, and recent hour\u2011by\u2011hour demand patterns also nudged the forecast.  \n\n**Business Insight**  \n- With the forecast only about 60\u202fMW low, the grid operator faced only a slight chance of being short on reserve power.  \n- The sub\u20111\u202f% error means the day\u2011ahead schedule could be trusted, keeping reserve margins tight but safe.  \n- Because the error was small, there was little risk of buying too much extra power, helping avoid unnecessary cost.",
+    "generated_at": "2026-08-21T19:59:10.259104+00:00"
+  },
+  "2025-12-25_2025-12-31": {
+    "fingerprint": "eace048921a1dbf8",
+    "text": "**MODEL INSIGHT**  \n- The forecast error was about 27\u202f% better than the model\u2019s usual performance for 2025, so it was noticeably better than usual.  \n- The model ran low, under\u2011predicting demand by roughly 60\u202fMW each hour (about 0.7\u202f% of total load).  \n- The biggest driver was the demand from the previous hour pulling the forecast down, with the warm temperature also nudging it lower, while other recent\u2011hour lags had smaller effects.  \n\n**BUSINESS INSIGHT**  \n- Because the error was under 1\u202f% of total demand, the risk of buying too much or too little reserve power was very small.  \n- The modest under\u2011prediction meant operators likely had a little extra reserve on hand, providing a safety cushion.  \n- Overall, the model\u2019s accuracy gave the grid operator confidence to rely on the forecast for day\u2011ahead planning during this week.",
+    "generated_at": "2026-08-21T19:59:12.105167+00:00"
+  },
+  "2025-12-02_2025-12-31": {
+    "fingerprint": "5a9ed8cfbc5f247a",
+    "text": "**Model Insight**  \n- The forecast was about a quarter better than the model\u2019s usual performance for the year.  \n- It ran low, missing the real demand by roughly\u202f60\u202fMW each hour (about\u202f0.7\u202f% off).  \n- The biggest influence was the demand from the previous hour, pulling the prediction down, with temperature also having a noticeable effect; the 2\u2011hour and 24\u2011hour lagged demands mattered only a little.  \n- Four days in the stretch were flagged as extreme\u2011temperature days, but they didn\u2019t dominate the overall error.  \n\n**Business Insight**  \n- An error of less than 1\u202f% means the risk of buying too much or too little reserve power was minimal.  \n- The slight under\u2011forecast would have left a modest extra reserve cushion, but not a large over\u2011purchase.  \n- Planners could rely on the model for day\u2011ahead scheduling with confidence, needing no major adjustments.  \n- Even on the few extreme\u2011temperature days, the forecast stayed close enough that no special contingency was required.",
+    "generated_at": "2026-08-21T19:59:19.885282+00:00"
+  },
+  "2025-01-01_2025-12-31": {
+    "fingerprint": "c954ce5656f66ccc",
+    "text": "**Model Insight**  \n- The forecast error was right on average for the model, about the same as usual.  \n- It tended to run low, missing the real demand by roughly 65\u202fMW each hour.  \n- The biggest driver was recent demand history \u2013 especially the load one hour earlier \u2013 while temperature only had a tiny effect.  \n\n**Business Insight**  \n- Because the miss was under 1\u202f% of total demand, the grid operator\u2019s reserve planning stayed essentially on target.  \n- The slight under\u2011prediction means there was a small chance of needing a little extra reserve, but not enough to raise concern.  \n- Overall, the model\u2019s reliability lets the operator run the system confidently without large safety margins.  \n- Even on the 23 unusually hot or cold days, the forecasts stayed close, keeping extreme\u2011weather risk low.",
+    "generated_at": "2026-08-21T19:59:32.481695+00:00"
+  },
+  "2025-05-22_2025-05-22": {
+    "fingerprint": "dc44458aa7e5eb57",
+    "text": "**MODEL INSIGHT**  \n- The forecast error was far worse than usual, about 170\u202f% higher than the model\u2019s typical yearly error.  \n- The model ran low, missing the real demand by roughly 327\u202fMW each hour (about 2\u202f% of the total load).  \n- The biggest driver was the recent demand itself \u2013 the load one hour earlier added about 3,600\u202fMW to the forecast, while temperature only added a modest 60\u202fMW and wasn\u2019t a key factor.  \n\n**BUSINESS INSIGHT**  \n- Under\u2011forecasting by around 330\u202fMW could leave a small chance of not having enough reserve power if operators relied solely on the prediction.  \n- Because the miss was only about 2\u202f% of total demand, the risk of a serious shortfall was low.  \n- Grid planners would likely keep a modest extra safety margin on this day, but the forecast was still reliable enough for normal operations.",
+    "generated_at": "2026-08-21T19:59:43.643344+00:00"
+  },
+  "2025-08-17_2025-08-17": {
+    "fingerprint": "0fa08081317019cd",
+    "text": "**MODEL INSIGHT**  \n- The mistake was much worse than usual \u2013 about one\u2011and\u2011a\u2011half times the model\u2019s typical error.  \n- The forecast ran low, missing the real load by roughly 300\u202fMW each hour.  \n- The prediction was driven mainly by recent demand, especially the hour\u2011before (about 4,000\u202fMW influence), while the temperature only added a small boost of around 200\u202fMW and was essentially normal.  \n\n**BUSINESS INSIGHT**  \n- Because the model under\u2011estimated demand by about 300\u202fMW, operators would have kept a modest extra reserve as a safety cushion.  \n- The error was only about 2\u202f% of total load, so the risk of a serious shortfall was low.  \n- With temperature staying near normal, there were no surprise spikes to worry about, keeping day\u2011ahead planning fairly smooth.  \n- Overall, the forecast remained reliable enough that routine reserve procurement could proceed without major adjustments.",
+    "generated_at": "2026-08-21T19:59:56.031657+00:00"
+  },
+  "2025-05-23_2025-05-23": {
+    "fingerprint": "2909a3b068bddcc7",
+    "text": "**Model Insight**  \n- The forecast error was noticeably worse than usual, about 150\u202f% higher than the model\u2019s typical yearly error.  \n- The model ran low, missing the real demand by roughly 300\u202fMW each hour.  \n- The forecast was driven mainly by the most recent demand numbers (the hour\u2011before load contributed the biggest boost), while the 2\u202f\u00b0C warmer\u2011than\u2011usual temperature played only a minor role.  \n\n**Business Insight**  \n- Under\u2011forecasting by about 300\u202fMW could leave a small gap that the grid operator would need to cover with extra reserve power.  \n- Because the error was larger than the model\u2019s normal performance, operators would likely keep a modest safety cushion in their reserve plans.  \n- Overall, the forecast was still close (within 2\u202f% of actual demand), so the risk of buying too much or too little reserve was relatively low.",
+    "generated_at": "2026-08-21T20:00:05.656832+00:00"
+  },
+  "2025-05-19_2025-05-19": {
+    "fingerprint": "687d1d4cfd6590d6",
+    "text": "**MODEL INSIGHT**  \n- The error was much worse than usual, more than double the typical mistake for this model.  \n- The forecast ran low, missing the real load by about 275\u202fMW each hour.  \n- Most of the prediction came from the recent demand numbers (the last hour and the hour before), while the warmer\u2011than\u2011usual temperature only added a little extra.\n\n**BUSINESS INSIGHT**  \n- Under\u2011forecasting by roughly 275\u202fMW could leave a small gap in reserve power, but it\u2019s only about 2\u202f% of total demand, so the risk of a shortage is low.  \n- Operators would likely keep a modest safety cushion to cover the slight shortfall.  \n- Because the forecast was less accurate than normal, planners would watch the next day\u2019s load a bit more closely.",
+    "generated_at": "2026-08-21T20:00:13.736626+00:00"
+  },
+  "2025-08-04_2025-08-04": {
+    "fingerprint": "9aa715c3f8ba6722",
+    "text": "**Model Insight**  \n- The forecast error was more than twice as big as the model\u2019s usual error for the year, so this day was worse than typical.  \n- The model ran low, missing the real demand by about 37\u202fMW each hour.  \n- The forecast was driven mainly by the recent demand pattern (the last hour\u2019s load contributed the most), while the slightly cooler temperature played little role.  \n\n**Business Insight**  \n- Under\u2011forecasting by roughly 40\u202fMW on a 16,500\u202fMW system means the operator might have bought a tiny bit less reserve than needed, but the shortfall is small.  \n- Because the error was still under 2\u202f% of total demand, the risk of a major shortfall was low and normal safety margins would cover it.  \n- The larger\u2011than\u2011usual error suggests operators should keep an extra eye on the forecast for this day, but overall the model remains reliable for planning.",
+    "generated_at": "2026-08-21T20:00:24.812998+00:00"
+  },
+  "2025-08-05_2025-08-05": {
+    "fingerprint": "86f6f975f2a4d484",
+    "text": "**MODEL INSIGHT**  \n- The error was much worse than usual, more than double the typical yearly error.  \n- The model ran low, missing the real demand by about 260\u202fMW each hour (roughly 1.5%).  \n- The forecast was driven mainly by the demand just an hour earlier (about a 3,800\u202fMW boost) with smaller pulls from two\u2011hour\u2011old demand, a tiny cooling effect from three\u2011hour\u2011old demand, and only a modest boost from the slightly cooler temperature.  \n\n**BUSINESS INSIGHT**  \n- Under\u2011forecasting by a couple of hundred megawatts could leave a small gap in reserve power if not accounted for.  \n- Because the miss was only about 1\u00bd\u202f% of total demand, the risk of a serious shortfall was low.  \n- Operators would likely keep a modest safety margin on reserve purchases to cover this occasional under\u2011prediction.",
+    "generated_at": "2026-08-21T20:00:33.653810+00:00"
+  },
+  "2025-05-20_2025-05-20": {
+    "fingerprint": "a83a6388a4560ca2",
+    "text": "**Model Insight**  \n- The forecast error was more than double the usual error for the year, so this day was worse than typical.  \n- The model ran low, missing the real demand by about 214\u202fMW each hour.  \n- The biggest driver was the demand from the previous hour, with the temperature only adding a small boost.  \n\n**Business Insight**  \n- Under\u2011forecasting by roughly 200\u202fMW could leave a slight shortfall in reserve power, but the gap is tiny compared with the 17,000\u202fMW load.  \n- Because the error was still under 2\u202f% of total demand, the risk of a major supply shortfall was low.  \n- Grid planners would likely keep a modest safety margin on this day, knowing the forecast was a bit off but not dramatically so.",
+    "generated_at": "2026-08-21T20:00:44.877690+00:00"
+  },
+  "2025-05-24_2025-05-24": {
+    "fingerprint": "26289c5152c06a68",
+    "text": "**Model Insight**  \n- The forecast error was more than double the model\u2019s usual error for the year, so it performed worse than normal.  \n- It ran low, missing the real demand by roughly 250\u202fMW each hour.  \n- The forecast was driven mainly by the demand seen an hour earlier (about 3,600\u202fMW) and the two\u2011hour\u2011old demand (about 370\u202fMW), with temperature adding only about 100\u202fMW and the three\u2011hour\u2011old demand pulling the prediction down a little.\n\n**Business Insight**  \n- Under\u2011forecasting by a few hundred megawatts means the operator might have bought a small amount less reserve than ideal, but the gap is tiny compared with the total load.  \n- Because the error was under 2\u202f% of demand, the risk of a supply shortfall was low for the day.  \n- Operators would likely keep a modest extra safety margin on this day, but the forecast was still reliable enough for routine planning.",
+    "generated_at": "2026-08-21T20:00:55.015655+00:00"
+  },
+  "2025-08-20_2025-08-20": {
+    "fingerprint": "73f5219e2a7e8f80",
+    "text": "**MODEL INSIGHT**  \n- The forecast error was almost twice as big as the model\u2019s usual error for the year, so it was worse than typical.  \n- The model ran low, missing the real demand by roughly 150\u202fMW each hour (about a 1\u20112% shortfall).  \n- The biggest driver was the very recent demand (the last hour\u2019s load), with temperature playing only a tiny role.  \n\n**BUSINESS INSIGHT**  \n- Because the miss was only about 1\u00bd\u202f% of total demand, the risk of under\u2011buying reserve power was small.  \n- Grid operators would likely keep a modest safety margin, but the forecast was reliable enough to avoid major adjustments.  \n- Overall, the model\u2019s performance gave confidence in day\u2011ahead planning while reminding planners to watch the latest demand trends.",
+    "generated_at": "2026-08-21T20:01:02.288274+00:00"
+  },
+  "2025-07-18_2025-07-18": {
+    "fingerprint": "a1b6b3192dbe4f72",
+    "text": "**Model Insight**  \n- The forecast error was noticeably worse than usual, about 93\u202f% higher than the model\u2019s average error for the whole year.  \n- The model ran low, missing the real demand by roughly 170\u202fMW each hour.  \n- The forecast was driven mainly by recent demand patterns (the last hour\u2019s load was the biggest influence), while the slightly cooler temperature played only a minor role.  \n\n**Business Insight**  \n- Because the miss was only about 1\u00bd\u202f% of total demand, the risk of under\u2011buying reserve power was small but not zero.  \n- Grid planners would likely keep a modest extra reserve margin to cover the slight under\u2011prediction.  \n- Overall, the forecast was reliable enough for day\u2011to\u2011day operations, though operators should stay a bit more cautious on days when the model\u2019s error tends to be higher.",
+    "generated_at": "2026-08-21T20:01:12.425624+00:00"
+  }
+}

@@ -1,6 +1,5 @@
 """Baseline forecasting model: SARIMAX using only load history and calendar
-features (hour, day of week, time of year, holiday flag). No temperature at all,
-this is the model we expect to struggle on extreme-temperature days."""
+features (hour, day of week, time of year, holiday flag). No temperature."""
 
 import pickle
 
@@ -16,9 +15,7 @@ DEFAULT_ORDER = (2, 1, 2)
 
 def build_calendar_features(index: pd.DatetimeIndex, fourier_harmonics: int = 3) -> pd.DataFrame:
     """Calendar-only exogenous regressors, no load history and no weather.
-
-    Fourier terms stand in for hour-of-day and day-of-year seasonality instead
-    of 24+365 separate dummy columns, that keeps the model fast to fit.
+    Fourier terms stand in for hour/day-of-year seasonality so it stays fast to fit.
     """
     hour_of_day = index.hour + index.minute / 60
     day_of_year = index.dayofyear
@@ -77,8 +74,7 @@ def save_model(fitted_model, path=config.MODELS_DIR / "baseline_sarimax.pkl") ->
 
 
 def save_test_predictions(actual: pd.Series, predicted: pd.Series) -> None:
-    """Save actual vs predicted so the extreme-day analysis step can reuse it
-    without refitting SARIMAX."""
+    """Save actual vs predicted so later steps can reuse it without refitting."""
     out = pd.DataFrame({"actual_mw": actual, "predicted_mw": predicted})
     config.PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
     out.to_parquet(config.BASELINE_PREDICTIONS_PATH)

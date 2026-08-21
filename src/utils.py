@@ -1,8 +1,5 @@
-"""Small shared helpers: error metrics and extreme-day flagging.
-
-Kept in one place so the threshold logic is identical everywhere it's used
-(baseline eval, weather-aware eval, LLM insight ranking).
-"""
+"""Small shared helpers: error metrics and extreme-day flagging, kept in one
+place so the threshold logic stays identical everywhere it's used."""
 
 import numpy as np
 import pandas as pd
@@ -43,10 +40,8 @@ def daily_min_max_temp(hourly_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def compute_extreme_thresholds(train_daily_temp: pd.DataFrame) -> dict:
-    """Compute the extreme-day percentile cutoffs from training data only, never test data.
-
-    This is the leakage-safe step: whatever cutoff comes out of this gets reused
-    as-is on the test set, it's never recalculated including test days.
+    """Compute the extreme-day percentile cutoffs from training data only.
+    Reused as a fixed cutoff on the test set -- never recomputed with test data.
     """
     pct = config.EXTREME_TEMP_PERCENTILE
     return {
@@ -67,9 +62,7 @@ def segment_metrics_by_extreme_day(
     predictions_df: pd.DataFrame, extreme_dates: set
 ) -> dict:
     """Split hourly actual/predicted rows into normal vs extreme days and score each group.
-
-    predictions_df needs actual_mw and predicted_mw columns, hourly indexed.
-    extreme_dates is a set of date objects, from flag_extreme_days().
+    predictions_df needs actual_mw/predicted_mw columns; extreme_dates comes from flag_extreme_days().
     """
     is_extreme = pd.Series(predictions_df.index.date, index=predictions_df.index).isin(
         extreme_dates
@@ -92,11 +85,7 @@ def segment_metrics_by_extreme_day(
 
 
 def time_ordered_split(df: pd.DataFrame, test_years: int = config.TEST_SET_YEARS):
-    """Hold out the most recent N full calendar years as the test set, never shuffle.
-
-    Shared by the baseline and weather-aware models so both are evaluated on
-    the exact same train/test boundary.
-    """
+    """Hold out the most recent N full calendar years as the test set, never shuffle."""
     last_year = df.index.max().year
     year_end = pd.Timestamp(f"{last_year}-12-31 23:00", tz=df.index.tz)
     if df.index.max() < year_end:

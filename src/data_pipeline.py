@@ -1,15 +1,9 @@
-"""Pulls ERCOT Coast-zone hourly load and Houston hourly weather, joins them on
-timestamp, and saves one clean parquet file for the rest of the project to use.
+"""Pulls ERCOT Coast-zone hourly load and Houston hourly weather, joins them
+on timestamp, and saves one clean parquet file for the rest of the project.
 
-This is a one-time, local step. Run it once, then commit the parquet it
-produces (data/processed/load_weather_joined.parquet) to the repo. Nothing
-downstream -- the notebooks, the models, or the deployed Streamlit app --
-ever needs to reach ERCOT or meteostat again after that.
-
-ERCOT load comes from files in data/raw/manual_archive/, sourced from
-ERCOT's own "Hourly Load Data Archives" page
-(https://www.ercot.com/gridinfo/load/load_hist). No account, no credentials,
-no live scraping of that page's link list -- see src/download_archive.py.
+This is a one-time, local step. Run it once and the resulting parquet
+(data/processed/load_weather_joined.parquet) is all the notebooks, models,
+and the deployed Streamlit app need going forward.
 """
 
 import zipfile
@@ -25,13 +19,9 @@ from src.download_archive import ensure_archive_files_present
 def load_manual_archive_files() -> pd.DataFrame:
     """Read every ERCOT historical load file sitting in data/raw/manual_archive/.
 
-    Handles both the newer .zip-wrapped files (2016 onward) and the older
-    bare .xls files (2015 and earlier), whichever ERCOT happened to publish
-    that year. gridstatus's own parser is reused here purely as a local file
-    parser -- it does the DST/hour-ending/"24:00" handling ERCOT's format
-    needs, and reusing it means this path is tested against the exact same
-    logic gridstatus itself validates, without this project making any
-    network call of its own.
+    Handles both the newer zipped files and the older bare .xls files.
+    Reuses gridstatus's own parser locally so ERCOT's DST/hour-ending
+    quirks don't need to be reimplemented from scratch.
     """
     if not config.ARCHIVE_DIR.exists():
         raise FileNotFoundError(
@@ -52,10 +42,7 @@ def load_manual_archive_files() -> pd.DataFrame:
 
     ercot = gridstatus.Ercot()
     frames = []
-    # every one of these needs to exist in some form before calling the parser
-    # below, since it unconditionally selects all of them at the end -- a
-    # missing one (older file format, unexpected column name) shouldn't crash
-    # the whole pipeline, only Coast is actually used downstream anyway
+    # covers zone-name spelling changes across years (e.g. FAR_WEST vs FWEST)
     zone_aliases = {
         "COAST": ["COAST"],
         "EAST": ["EAST"],
@@ -96,8 +83,7 @@ def load_manual_archive_files() -> pd.DataFrame:
         f"{combined['Interval Start'].max()}, {len(combined)} rows"
     )
 
-    # a real gap in the archive (a year you haven't downloaded yet) should be
-    # visible, not silently modeled across
+    # flag any real gap (e.g. a missing year) instead of silently modeling across it
     gap_hours = combined["Interval Start"].diff().dt.total_seconds().div(3600)
     big_gaps = gap_hours[gap_hours > 24]
     if not big_gaps.empty:
@@ -124,15 +110,10 @@ def _station_has_hourly_data(station_id: str, start: pd.Timestamp, end: pd.Times
 
 
 def select_houston_station(start: pd.Timestamp, end: pd.Timestamp, probe_days: int = 7) -> str:
-    """Pick the closest station to the Houston point that actually has hourly
-    data across the whole requested range, not just the closest one on paper.
-
-    Nearest-by-distance isn't the same as having data -- a small local
-    station can be geographically closest but have a sparse or empty
-    archive. This walks candidates in distance order and probes a short
-    window near the start of each calendar year in range (a full multi-year
-    probe would hit meteostat's 3-year request cap), picking the first
-    station that has data for every one of those years.
+    """Pick the closest station to Houston that actually has data for the
+    whole range, not just the nearest one on paper. Probes a short window
+    near the start of each year rather than the full range at once, since
+    meteostat caps a single request at 3 years.
     """
     point = meteostat.Point(
         config.HOUSTON_LAT, config.HOUSTON_LON, config.HOUSTON_ELEVATION_M
@@ -163,11 +144,10 @@ def select_houston_station(start: pd.Timestamp, end: pd.Timestamp, probe_days: i
 
 
 def fetch_houston_weather(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
-    """Pull hourly weather for a station near the Houston point that actually has data for this range, already localized to Central time."""
+    """Pull hourly weather for a Houston-area station, one year at a time, localized to Central time."""
     station_id = select_houston_station(start, end)
 
-    # meteostat blocks hourly requests spanning more than 3 years by default,
-    # so pull one calendar year at a time and stitch the results together
+    # meteostat caps a single hourly request at 3 years, so pull year by year
     yearly_frames = []
     for year in range(start.year, end.year + 1):
         year_start = max(start, pd.Timestamp(year, 1, 1))
@@ -234,14 +214,8 @@ def check_dst_days(df: pd.DataFrame) -> None:
 
 
 def close_hourly_gaps(df: pd.DataFrame, max_interpolate_hours: int = 3) -> pd.DataFrame:
-    """Reindex onto a complete, regularly-spaced hourly index.
-
-    Both the ERCOT and meteostat sides can be missing individual hours (a
-    dropped NaN row, a gap in the weather station's record), and an inner
-    join just silently skips those timestamps. If that's left alone, every
-    shift()/rolling() feature built later on treats "N rows back" as "N hours
-    back", which is only true if the index has zero gaps. Short gaps get
-    interpolated, longer ones are left as NaN and reported rather than guessed.
+    """Reindex onto a complete hourly grid so later lag features don't silently
+    skip missing hours. Short gaps get interpolated, longer ones stay NaN.
     """
     full_index = pd.date_range(df.index.min(), df.index.max(), freq="h", tz=df.index.tz)
     missing_before = full_index.difference(df.index)
