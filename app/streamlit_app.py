@@ -15,6 +15,12 @@ import streamlit as st
 from dotenv import load_dotenv
 from groq import Groq
 
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 from src import config
 from src.llm_insights import (
     InsightCache,
@@ -155,15 +161,29 @@ def metric_card(icon: str, icon_bg: str, label: str, value: str, caption: str) -
     )
 
 
-def themed_line_chart(x_actual, y_actual, x_pred, y_pred, x_title: str, y_title: str) -> go.Figure:
+def themed_line_chart(
+    x_actual, y_actual, x_pred, y_pred, x_title: str, y_title: str
+) -> go.Figure:
     """A transparent-background chart so it blends into whichever Streamlit
     theme is active -- the "streamlit" chart theme (the st.plotly_chart default)
     fills in the correct text/gridline colors for light or dark mode."""
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x_actual, y=y_actual, name="Actual Load (MW)",
-                              line=dict(color=ACTUAL_COLOR, width=2.5)))
-    fig.add_trace(go.Scatter(x=x_pred, y=y_pred, name="Predicted Load (MW)",
-                              line=dict(color=PREDICTED_COLOR, width=2.5)))
+    fig.add_trace(
+        go.Scatter(
+            x=x_actual,
+            y=y_actual,
+            name="Actual Load (MW)",
+            line=dict(color=ACTUAL_COLOR, width=2.5),
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=x_pred,
+            y=y_pred,
+            name="Predicted Load (MW)",
+            line=dict(color=PREDICTED_COLOR, width=2.5),
+        )
+    )
     fig.update_layout(
         height=420,
         margin=dict(l=10, r=10, t=10, b=10),
@@ -200,6 +220,7 @@ def load_extreme_dates() -> set:
 @st.cache_resource
 def get_groq_client() -> Groq | None:
     import os
+
     api_key = os.environ.get("GROQ_API_KEY")
     return Groq(api_key=api_key) if api_key else None
 
@@ -224,8 +245,13 @@ def show_insight(start_date: dt.date, end_date: dt.date, key_suffix: str) -> Non
     offers to generate one live -- so every day or range can get a real
     explanation, not just the handful primed ahead of time."""
     cached = get_cached_insight(
-        st.session_state.insight_cache, daily_summary, shap_df, extreme_dates,
-        full_year_baseline_mae, start_date, end_date,
+        st.session_state.insight_cache,
+        daily_summary,
+        shap_df,
+        extreme_dates,
+        full_year_baseline_mae,
+        start_date,
+        end_date,
     )
 
     st.write("")
@@ -239,8 +265,14 @@ def show_insight(start_date: dt.date, end_date: dt.date, key_suffix: str) -> Non
     def _generate():
         with st.spinner("Generating insight..."):
             generate_and_cache_insight(
-                st.session_state.insight_cache, client, daily_summary, shap_df,
-                extreme_dates, full_year_baseline_mae, start_date, end_date,
+                st.session_state.insight_cache,
+                client,
+                daily_summary,
+                shap_df,
+                extreme_dates,
+                full_year_baseline_mae,
+                start_date,
+                end_date,
             )
 
     st.markdown(
@@ -251,9 +283,15 @@ def show_insight(start_date: dt.date, end_date: dt.date, key_suffix: str) -> Non
         unsafe_allow_html=True,
     )
     if client is not None:
-        st.button("Generate insight for this view", key=f"gen_{key_suffix}", on_click=_generate)
+        st.button(
+            "Generate insight for this view",
+            key=f"gen_{key_suffix}",
+            on_click=_generate,
+        )
     else:
-        st.caption("Set GROQ_API_KEY to generate a new insight live for views that aren't already cached.")
+        st.caption(
+            "Set GROQ_API_KEY to generate a new insight live for views that aren't already cached."
+        )
 
 
 if not config.WEATHER_MODEL_PREDICTIONS_PATH.exists():
@@ -321,21 +359,38 @@ with st.sidebar:
             on_click=on_click,
         )
 
-    qbtn("Today", st.session_state.mode == "single" and st.session_state.single_date == most_recent,
-         lambda: go_single(most_recent))
-    qbtn("Yesterday",
-         st.session_state.mode == "single" and st.session_state.single_date == available_dates[-2],
-         lambda: go_single(available_dates[-2]))
-    qbtn("Last 7 days", st.session_state.mode == "range" and st.session_state.range_days == 7,
-         lambda: go_range(7))
-    qbtn("Last 30 days", st.session_state.mode == "range" and st.session_state.range_days == 30,
-         lambda: go_range(30))
-    qbtn("Full year", st.session_state.mode == "range" and st.session_state.range_days == full_year_days,
-         lambda: go_range(full_year_days))
+    qbtn(
+        "Today",
+        st.session_state.mode == "single"
+        and st.session_state.single_date == most_recent,
+        lambda: go_single(most_recent),
+    )
+    qbtn(
+        "Yesterday",
+        st.session_state.mode == "single"
+        and st.session_state.single_date == available_dates[-2],
+        lambda: go_single(available_dates[-2]),
+    )
+    qbtn(
+        "Last 7 days",
+        st.session_state.mode == "range" and st.session_state.range_days == 7,
+        lambda: go_range(7),
+    )
+    qbtn(
+        "Last 30 days",
+        st.session_state.mode == "range" and st.session_state.range_days == 30,
+        lambda: go_range(30),
+    )
+    qbtn(
+        "Full year",
+        st.session_state.mode == "range"
+        and st.session_state.range_days == full_year_days,
+        lambda: go_range(full_year_days),
+    )
     qbtn("Top error days (10)", st.session_state.mode == "top_errors", go_top_errors)
 
     st.caption(
-        "\"Today\" and \"Yesterday\" point at the most recent dates in the "
+        '"Today" and "Yesterday" point at the most recent dates in the '
         "2025 held-out test year, since this viewer only reads saved model "
         "output, not live data."
     )
@@ -353,7 +408,9 @@ if st.session_state.mode == "single":
     day_data = predictions[predictions.index.date == picked_date]
 
     st.title("Actual vs Predicted Load")
-    st.caption("Explore the weather-aware forecast performance for any day in the 2025 test year.")
+    st.caption(
+        "Explore the weather-aware forecast performance for any day in the 2025 test year."
+    )
 
     if day_data.empty:
         st.info("No data for this date, pick another.")
@@ -366,15 +423,58 @@ if st.session_state.mode == "single":
     pct_error = (mean_abs_error / actual_avg) * 100
 
     c1, c2, c3, c4 = st.columns(4)
-    c1.markdown(metric_card("\u3030\ufe0f", ICON_BLUE, "Mean Absolute Error", f"{mean_abs_error:.0f} MW", f"{pct_error:.1f}% of actual demand"), unsafe_allow_html=True)
-    c2.markdown(metric_card("\U0001f321\ufe0f", ICON_BLUE, "Avg Temp Deviation", f"{avg_temp_deviation:+.1f} \u00b0C", "Compared to historical norm"), unsafe_allow_html=True)
-    c3.markdown(metric_card("\U0001f4c8", ICON_GREEN, "Actual Avg Load", f"{actual_avg/1000:.2f}k MW", "Average hourly actual load"), unsafe_allow_html=True)
-    c4.markdown(metric_card("\u22ef", ICON_PURPLE, "Predicted Avg Load", f"{predicted_avg/1000:.2f}k MW", "Average hourly predicted load"), unsafe_allow_html=True)
+    c1.markdown(
+        metric_card(
+            "\u3030\ufe0f",
+            ICON_BLUE,
+            "Mean Absolute Error",
+            f"{mean_abs_error:.0f} MW",
+            f"{pct_error:.1f}% of actual demand",
+        ),
+        unsafe_allow_html=True,
+    )
+    c2.markdown(
+        metric_card(
+            "\U0001f321\ufe0f",
+            ICON_BLUE,
+            "Avg Temp Deviation",
+            f"{avg_temp_deviation:+.1f} \u00b0C",
+            "Compared to historical norm",
+        ),
+        unsafe_allow_html=True,
+    )
+    c3.markdown(
+        metric_card(
+            "\U0001f4c8",
+            ICON_GREEN,
+            "Actual Avg Load",
+            f"{actual_avg/1000:.2f}k MW",
+            "Average hourly actual load",
+        ),
+        unsafe_allow_html=True,
+    )
+    c4.markdown(
+        metric_card(
+            "\u22ef",
+            ICON_PURPLE,
+            "Predicted Avg Load",
+            f"{predicted_avg/1000:.2f}k MW",
+            "Average hourly predicted load",
+        ),
+        unsafe_allow_html=True,
+    )
 
     st.write("")
     st.markdown(f"**Actual vs predicted load \u2014 {picked_date}**")
 
-    fig = themed_line_chart(day_data.index, day_data["actual_mw"], day_data.index, day_data["predicted_mw"], "Time", "MW")
+    fig = themed_line_chart(
+        day_data.index,
+        day_data["actual_mw"],
+        day_data.index,
+        day_data["predicted_mw"],
+        "Time",
+        "MW",
+    )
     st.plotly_chart(fig, use_container_width=True, theme="streamlit")
 
     show_insight(picked_date, picked_date, key_suffix=f"single_{picked_date}")
@@ -385,36 +485,98 @@ elif st.session_state.mode == "range":
     is_full_year = n >= full_year_days
     range_dates = available_dates[-n:]
     range_daily = daily_summary.loc[
-        (daily_summary.index.date >= range_dates[0]) & (daily_summary.index.date <= range_dates[-1])
+        (daily_summary.index.date >= range_dates[0])
+        & (daily_summary.index.date <= range_dates[-1])
     ]
-    period_phrase = "the full 2025 test year" if is_full_year else f"the last {n} days of the 2025 test year"
+    period_phrase = (
+        "the full 2025 test year"
+        if is_full_year
+        else f"the last {n} days of the 2025 test year"
+    )
     chart_phrase = "full test year" if is_full_year else f"last {n} days"
 
     st.title("Actual vs Predicted Load")
     st.caption(f"Daily averages over {period_phrase}.")
 
     c1, c2, c3, c4 = st.columns(4)
-    c1.markdown(metric_card("\u3030\ufe0f", ICON_BLUE, "Avg Daily MAE", f"{range_daily['mean_abs_error_mw'].mean():.0f} MW", f"{range_daily['error_pct_avg'].mean():.1f}% of actual demand"), unsafe_allow_html=True)
-    c2.markdown(metric_card("\U0001f321\ufe0f", ICON_BLUE, "Avg Temp Deviation", f"{range_daily['temp_deviation_avg'].mean():+.1f} \u00b0C", "Compared to historical norm"), unsafe_allow_html=True)
-    c3.markdown(metric_card("\U0001f4c8", ICON_GREEN, "Actual Avg Load", f"{range_daily['actual_mw_avg'].mean()/1000:.2f}k MW", "Average hourly actual load"), unsafe_allow_html=True)
-    c4.markdown(metric_card("\u22ef", ICON_PURPLE, "Predicted Avg Load", f"{range_daily['predicted_mw_avg'].mean()/1000:.2f}k MW", "Average hourly predicted load"), unsafe_allow_html=True)
+    c1.markdown(
+        metric_card(
+            "\u3030\ufe0f",
+            ICON_BLUE,
+            "Avg Daily MAE",
+            f"{range_daily['mean_abs_error_mw'].mean():.0f} MW",
+            f"{range_daily['error_pct_avg'].mean():.1f}% of actual demand",
+        ),
+        unsafe_allow_html=True,
+    )
+    c2.markdown(
+        metric_card(
+            "\U0001f321\ufe0f",
+            ICON_BLUE,
+            "Avg Temp Deviation",
+            f"{range_daily['temp_deviation_avg'].mean():+.1f} \u00b0C",
+            "Compared to historical norm",
+        ),
+        unsafe_allow_html=True,
+    )
+    c3.markdown(
+        metric_card(
+            "\U0001f4c8",
+            ICON_GREEN,
+            "Actual Avg Load",
+            f"{range_daily['actual_mw_avg'].mean()/1000:.2f}k MW",
+            "Average hourly actual load",
+        ),
+        unsafe_allow_html=True,
+    )
+    c4.markdown(
+        metric_card(
+            "\u22ef",
+            ICON_PURPLE,
+            "Predicted Avg Load",
+            f"{range_daily['predicted_mw_avg'].mean()/1000:.2f}k MW",
+            "Average hourly predicted load",
+        ),
+        unsafe_allow_html=True,
+    )
 
     st.write("")
     st.markdown(f"**Daily actual vs predicted load \u2014 {chart_phrase}**")
 
-    fig = themed_line_chart(range_daily.index, range_daily["actual_mw_avg"], range_daily.index, range_daily["predicted_mw_avg"], "Date", "MW (daily avg)")
+    fig = themed_line_chart(
+        range_daily.index,
+        range_daily["actual_mw_avg"],
+        range_daily.index,
+        range_daily["predicted_mw_avg"],
+        "Date",
+        "MW (daily avg)",
+    )
     st.plotly_chart(fig, use_container_width=True, theme="streamlit")
 
-    show_insight(range_dates[0], range_dates[-1], key_suffix=f"range_{range_dates[0]}_{range_dates[-1]}")
+    show_insight(
+        range_dates[0],
+        range_dates[-1],
+        key_suffix=f"range_{range_dates[0]}_{range_dates[-1]}",
+    )
 
-    flagged = [d for d in range_dates if st.session_state.insight_cache.has(period_key(d, d))]
+    flagged = [
+        d for d in range_dates if st.session_state.insight_cache.has(period_key(d, d))
+    ]
     if flagged:
         st.write("")
-        st.markdown(f"**{len(flagged)} day(s) in this range already have a generated insight:**")
+        st.markdown(
+            f"**{len(flagged)} day(s) in this range already have a generated insight:**"
+        )
         for d in flagged:
             cols = st.columns([4, 1])
             cols[0].markdown(f"- **{d}**")
-            cols[1].button("View", key=f"range_view_{d}", use_container_width=True, on_click=go_single, args=(d,))
+            cols[1].button(
+                "View",
+                key=f"range_view_{d}",
+                use_container_width=True,
+                on_click=go_single,
+                args=(d,),
+            )
 
 # ---- top error days view ----
 else:
@@ -430,7 +592,11 @@ else:
         has_insight = st.session_state.insight_cache.has(period_key(d, d))
         cols = st.columns([3, 1])
         with cols[0]:
-            badge = '<div class="error-day-meta" style="margin-top:6px">\u2728 Insight ready</div>' if has_insight else ""
+            badge = (
+                '<div class="error-day-meta" style="margin-top:6px">\u2728 Insight ready</div>'
+                if has_insight
+                else ""
+            )
             st.markdown(
                 '<div class="error-day-card">'
                 f"<b>{date.strftime('%B %d, %Y')}</b>"
@@ -441,4 +607,10 @@ else:
                 unsafe_allow_html=True,
             )
         with cols[1]:
-            st.button("View day", key=f"view_{d}", use_container_width=True, on_click=go_single, args=(d,))
+            st.button(
+                "View day",
+                key=f"view_{d}",
+                use_container_width=True,
+                on_click=go_single,
+                args=(d,),
+            )
