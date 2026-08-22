@@ -17,6 +17,25 @@ model.
 
 ---
 
+## Key Finding
+
+Adding temperature to the model doesn't move overall forecast accuracy — a same-model ablation
+confirms that directly. What it does do is cut the accuracy gap between normal and
+extreme-temperature days by more than two-thirds (a 27% relative gap down to 8.5%), making the
+model meaningfully more consistent exactly on the days a grid operator's forecast matters most.
+
+## Results at a Glance
+
+| Model | Normal-day MAPE | Extreme-day MAPE |
+|---|---|---|
+| Baseline — SARIMAX (calendar only) | 70.2% | 24.7% |
+| No-weather XGBoost (ablation) | 0.78% | 0.99% |
+| Weather-aware XGBoost | 0.83% | 0.90% |
+
+23 extreme days (21 cold, 2 hot) vs. 342 normal days, in the 2025 held-out test year. Full RMSE
+numbers and the reasoning behind them are in [Isolating the Weather Effect](#isolating-the-weather-effect)
+below.
+
 ## Problem Statement
 
 Most time-series tutorials stop at a calendar-only model: fit it on load history, day of week,
@@ -76,27 +95,25 @@ flowchart LR
 
 This is the actual analytical focus of the project, not the forecasting itself.
 
-The first surprise came from the baseline model alone, before weather even entered the picture.
-Splitting SARIMAX's test-year error by normal vs. extreme-temperature days, I expected worse
-accuracy on extreme days. What I found was the opposite: MAPE was 70.2% on normal days and only
-24.7% on the 21 cold-extreme days. A quick bias check ruled out the obvious explanation — that the
-model was just going flat on those days — it wasn't. The more likely reason: ERCOT's biggest
-cold-demand spikes are driven by a handful of well-known, sharply forecastable events (Winter Storm
-Uri, in February 2021, is inside the training range), which may make a calendar-only model
-unusually well-calibrated for cold extremes specifically. With only 2 hot days in the test year,
-the heat side of the original idea wasn't really tested either way.
+Splitting the baseline's test-year error by normal vs. extreme-temperature days produced a
+surprise: MAPE was 70.2% on normal days but only 24.7% on the 21 cold-extreme days — the opposite
+of what I expected. A bias check ruled out the obvious explanation, that the model was just going
+flat on those days. The more likely reason: ERCOT's biggest cold-demand spikes are driven by a
+handful of well-known events (Winter Storm Uri, February 2021, sits inside the training range),
+which may make a calendar-only model unusually well-calibrated for cold extremes specifically.
+Only 2 hot days landed in the test year, so the heat side of the idea wasn't really tested either
+way.
 
-That result meant a straight baseline-vs-weather-aware comparison couldn't answer the real
-question, since those two models differ in more than one way — model family and feature set, not
-just weather. So the no-weather ablation exists specifically to hold everything else constant:
-same XGBoost architecture, same lag/rolling/calendar features, temperature removed. The gap between
-that model and the full weather-aware model is what's actually attributable to temperature.
+That result also meant a plain baseline-vs-weather-aware comparison couldn't isolate what weather
+contributes, since those two models differ in architecture and features, not just temperature. The
+no-weather ablation exists to hold everything else constant — same XGBoost, same lag/rolling/
+calendar features, temperature removed — so the gap between it and the weather-aware model is what
+weather actually contributes.
 
-Extreme-day thresholds (top/bottom 5% of daily min/max temperature) are computed from
-training-year data only, then applied as a fixed number to the test year, so the test set's own
-temperatures never influence what counts as "extreme" (`compute_extreme_thresholds` in
-`src/utils.py`). That threshold worked out to below 4.0°C or above 36.0°C, flagging 23 days out of
-365 in the 2025 test year — 21 cold, 2 hot.
+Extreme-day thresholds (top/bottom 5% of daily min/max temperature) come from training-year data
+only, then get applied as a fixed number to the test year, so the test set never influences what
+counts as "extreme" (`compute_extreme_thresholds` in `src/utils.py`). That worked out to below
+4.0°C or above 36.0°C — 23 days out of 365 in the 2025 test year, 21 cold and 2 hot.
 
 | Model | Normal-day MAPE | Normal-day RMSE | Extreme-day MAPE | Extreme-day RMSE |
 |---|---|---|---|---|
@@ -104,23 +121,20 @@ temperatures never influence what counts as "extreme" (`compute_extreme_threshol
 | No-weather XGBoost (ablation) | 0.78% | 174 MW | 0.99% | 201 MW |
 | Weather-aware XGBoost | 0.83% | 181 MW | 0.90% | 182 MW |
 
-Full numbers in `outputs/comparison_table.csv`. What the table actually shows:
+Full numbers in `outputs/comparison_table.csv` (screenshot in [Screenshots](#screenshots) below).
 
 - **Almost all of the accuracy jump comes from XGBoost, not weather.** Moving from SARIMAX to
-  XGBoost with load-history features cuts MAPE by about 99%, from 67% overall down to under 1% —
-  and the no-weather ablation gets that same jump, since it has no weather features either.
+  XGBoost cuts MAPE by about 99%, from 67% overall down to under 1% — and the no-weather ablation
+  gets that same jump, since it has no weather features either.
 - **Weather doesn't improve average accuracy.** The weather-aware model's normal-day MAPE (0.83%)
-  is actually a touch higher than the ablation's (0.78%).
-- **Weather does earn its place on the days it's meant for.** Extreme-day MAPE drops from 0.99%
-  (no weather) to 0.90% (with weather) — about a 9.7% relative improvement. More tellingly, the gap
-  between normal-day and extreme-day error shrinks from 27.0% (relative, without weather) to 8.5%
-  (with it). Weather makes the model more consistent on the days that matter most, rather than
-  sharper on average.
+  is a touch higher than the ablation's (0.78%).
+- **Weather does earn its place on the days it's meant for.** Extreme-day MAPE drops from 0.99% to
+  0.90% with weather added, and the normal-vs-extreme gap shrinks from 27.0% (relative) to 8.5%.
+  Weather makes the model more consistent on the days that matter most, not sharper on average.
 
-SHAP backs this up directly: temperature ranks 4th out of the weather-aware model's ten features by
-mean absolute SHAP value, behind the three most recent load-lag features (1, 2, and 3 hours back)
-and ahead of hour-of-day and day-of-week. That's the expected shape for a next-hour forecast —
-recent load dominates, but weather earns a real, non-trivial share, not just a token one.
+SHAP backs this up: temperature ranks 4th of ten features by mean absolute SHAP value, behind the
+three most recent load-lag features and ahead of hour-of-day and day-of-week — the expected shape
+for a next-hour forecast, where recent load dominates but weather still earns a real share.
 
 ## The Streamlit Viewer
 
@@ -215,6 +229,8 @@ ercot-forecasting/
 │       ├── no_weather_model_test_predictions.parquet
 │       ├── weather_model_test_predictions.parquet
 │       └── weather_model_test_shap.parquet
+├── docs/
+│   └── screenshots/               # notebook and app screenshots used in this README
 ├── models/
 │   ├── weather_xgboost.json
 │   └── no_weather_xgboost.json   # baseline SARIMAX saves locally as a .pkl, gitignored
@@ -289,6 +305,48 @@ weather-aware walkthrough.
 - **Live insight generation needs a Groq key in the deploy environment.** Without one, the app
   still works — it just only shows the pre-cached views.
 
+## Screenshots
+
+Two that matter most: the live app, and the chart the whole project's hypothesis rests on.
+Everything else backing up the numbers above is one click away.
+
+![Forecast viewer — single day view with metric cards](docs/screenshots/streamlit-forecast-viewer.png)
+
+![Load vs temperature, showing the U-shaped relationship](docs/screenshots/eda-load-vs-temperature-ushape.png)
+
+<details>
+<summary><b>Model comparison table and SHAP feature importance</b></summary>
+
+#### Baseline vs. no-weather ablation vs. weather-aware — normal vs. extreme days
+
+![Comparison table from outputs/comparison_table.csv](docs/screenshots/comparison-table.png)
+
+#### SHAP — what the weather-aware model actually relies on
+
+![SHAP feature importance for the weather-aware model](docs/screenshots/shap-feature-importance.png)
+
+</details>
+
+<details>
+<summary><b>Predicted vs. actual — baseline vs. weather-aware, first two weeks of the test year</b></summary>
+
+#### Baseline (SARIMAX, calendar only)
+
+![Baseline predicted vs actual load](docs/screenshots/baseline-predicted-vs-actual.png)
+
+#### Weather-Aware (XGBoost + temperature)
+
+![Weather-aware predicted vs actual load](docs/screenshots/weather-aware-predicted-vs-actual.png)
+
+</details>
+
+<details>
+<summary><b>Streamlit app — model and business insight card</b></summary>
+
+![Model insight and business insight for a selected day](docs/screenshots/streamlit-model-business-insight.png)
+
+</details>
+
 ## Dataset & Acknowledgments
 
 - **ERCOT** (Electric Reliability Council of Texas) — hourly load by weather zone, from ERCOT's
@@ -299,9 +357,9 @@ weather-aware walkthrough.
 
 ## About Me
 
-I'm Yash Shrivastava, a final-year Electronics & Telecommunication Engineering student building
-toward a data analyst role. This is the third project in my portfolio, alongside a CLV +
-segmentation project on the OLIST dataset and an IT service-desk analytics + NL-to-SQL chatbot on
-ServiceNow data.
+I'm Yash Shrivastava, a final-year Electronics & Telecommunication Engineering student at Shri
+G.S. Institute of Technology and Science, Indore. I'm building toward Data Analyst, Data Engineer,
+and Applied AI/ML roles, and work mainly in Python, SQL, pandas, scikit-learn, XGBoost, and Power
+BI, with hands-on GenAI/LLM integration experience like the insight layer in this project.
 
 [LinkedIn](https://www.linkedin.com/in/yash-shrivastava-a84465246/) · [GitHub](https://github.com/YashShrivastava4) · [yash.shrivastava494@gmail.com](mailto:yash.shrivastava494@gmail.com)
